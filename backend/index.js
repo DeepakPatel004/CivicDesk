@@ -1,19 +1,50 @@
-require('dotenv').config();
-const express = require("express");
-const mongoose = require("mongoose");
-
-const PORT = process.env.PORT || 5000;
-const uri = process.env.MONGO_URL;
+const express = require('express');
+const mongoose = require('mongoose');
+const dotenv = require('dotenv');
+const cors = require('cors');
+const authRoutes = require('./routes/authRoutes');
+const reportRoutes = require('./routes/reportRoutes');
 
 const app = express();
+dotenv.config();
+app.use(express.json()); 
+app.use(cors());
 
-app.listen(PORT, ()=>{
-    console.log("server started");
+// All routes defined in authRoutes will be prefixed with /api/auth
+app.use('/api/auth', authRoutes);
 
-    mongoose.connect(uri);
-    
-    console.log("DB connected");
+app.use('/api/reports', reportRoutes);
+
+//Define a Simple Root Route for Testing ---
+app.get('/', (req, res) => {
+    res.send("Backend server is running successfully!");
 });
+
+
+// Connect to Database and Start Server ---
+const PORT = process.env.PORT ;
+const DATABASE_URL = process.env.DATABASE_URL; // Make sure this matches your .env file
+
+const startServer = () => {
+    try {
+        // Connect to the database first
+        mongoose.connect(DATABASE_URL);
+        console.log("DB connected successfully");
+
+        // If the connection is successful, then start the server
+        app.listen(PORT, () => {
+            console.log(`Server started on port ${PORT}`);
+        });
+
+    } catch (error) {
+        console.error("Failed to connect to the database", error);
+        process.exit(1); // Exit the process with an error code
+    }
+};
+
+startServer();
+
+
 
 
 
