@@ -11,10 +11,11 @@ dotenv.config();
 app.use(express.json()); 
 app.use(cors());
 
-// All routes defined in authRoutes will be prefixed with /api/auth
+// All routes defined in authRoutes will be prefixed with /api/auth ... For user side frontend
 app.use('/api/auth', authRoutes);
-
 app.use('/api/reports', reportRoutes);
+
+
 
 //Define a Simple Root Route for Testing ---
 app.get('/', (req, res) => {
@@ -47,8 +48,6 @@ const startServer = () => {
 };
 
 startServer();
-
-
 
 
 

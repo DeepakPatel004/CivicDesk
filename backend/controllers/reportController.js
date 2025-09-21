@@ -17,7 +17,6 @@ async function uploadFileToCloudinary(file, folder) {
     return await cloudinary.uploader.upload(dataURI, options);
 }
 
-
 // --- SUBMIT A NEW REPORT ---
 exports.submitReport = async (req, res) => {
     try {
@@ -71,5 +70,27 @@ exports.submitReport = async (req, res) => {
     } catch (error) {
         console.error("Error submitting report:", error);
         res.status(500).json({ message: "Server error during report submission." });
+    }
+};
+
+// --- GET ALL REPORTS FOR THE LOGGED-IN USER ---
+// This is the new function for the user's dashboard.
+exports.getUserReports = async (req, res) => {
+    try {
+        // The user's ID is available from the authMiddleware
+        const userId = req.user.id;
+
+        // Find all reports where 'submittedBy' matches the logged-in user's ID
+        // Sort by the most recent reports first
+        const reports = await Report.find({ submittedBy: userId }).sort({ createdAt: -1 });
+
+        res.status(200).json({
+            message: "User reports fetched successfully.",
+            reports: reports,
+        });
+
+    } catch (error) {
+        console.error("Error fetching user reports:", error);
+        res.status(500).json({ message: "Server error while fetching reports." });
     }
 };
