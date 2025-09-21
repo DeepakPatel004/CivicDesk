@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 const cors = require('cors');
 const authRoutes = require('./routes/authRoutes');
 const reportRoutes = require('./routes/reportRoutes');
+const cloudinaryConnect = require('./config/cloudinary');
 
 const app = express();
 dotenv.config();
@@ -27,9 +28,12 @@ const DATABASE_URL = process.env.DATABASE_URL; // Make sure this matches your .e
 
 const startServer = () => {
     try {
-        // Connect to the database first
+        // Connect to the database
         mongoose.connect(DATABASE_URL);
         console.log("DB connected successfully");
+
+        // Connect to Cloudinary
+        cloudinaryConnect();
 
         // If the connection is successful, then start the server
         app.listen(PORT, () => {
