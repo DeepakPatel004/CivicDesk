@@ -1,0 +1,7 @@
+:root {
+    --color-primary: 25, 118, 210; /* A professional blue */
+    --color-secondary: 255, 152, 0; /* Orange-ish tint */
+    --color-accent: 0, 150, 136; /* Teal accent */
+    --color-neutral: 243, 244, 246; /* Tailwind gray-100 */
+    --color-bg: 255, 255, 255; /* White background */
+  }
