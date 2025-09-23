@@ -6,262 +6,223 @@
     <title>CivicDesk API Tester</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #111827;
-            color: #d1d5db;
-        }
-        .card {
-            background-color: #1f2937;
-            border: 1px solid #374151;
-        }
-        .btn {
-            background-color: #3b82f6;
-            color: white;
-            font-weight: 600;
-            padding: 0.5rem 1rem;
-            border-radius: 0.375rem;
-            transition: background-color 0.2s;
-        }
-        .btn:hover {
-            background-color: #2563eb;
-        }
-        input, select {
-            background-color: #374151;
-            border: 1px solid #4b5563;
-            color: #d1d5db;
-            padding: 0.5rem;
-            border-radius: 0.375rem;
-        }
-        pre {
-            background-color: #0d1117;
-            padding: 1rem;
-            border-radius: 0.375rem;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            font-family: monospace;
-        }
+        body { font-family: 'Inter', sans-serif; }
+        .api-section { transition: all 0.3s ease-in-out; }
+        pre { white-space: pre-wrap; word-break: break-all; }
     </style>
 </head>
-<body class="p-8">
+<body class="bg-gray-100 text-gray-800">
 
-    <div class="max-w-6xl mx-auto">
-        <h1 class="text-3xl font-bold text-white mb-2">CivicDesk API Testing Dashboard</h1>
-        <p class="mb-8 text-gray-400">A simple interface to test all backend endpoints.</p>
+    <div class="container mx-auto p-4 sm:p-6 md:p-8">
+        <header class="text-center mb-10">
+            <h1 class="text-4xl font-bold text-blue-600">CivicDesk API Testing Dashboard</h1>
+            <p class="text-gray-600 mt-2">A simple interface to test the complete user workflow.</p>
+        </header>
 
-        <!-- Global Info -->
-        <div class="card p-4 rounded-lg mb-8">
-            <h2 class="text-xl font-semibold text-white mb-2">Global Info</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label for="baseUrl" class="block text-sm font-medium mb-1">Base URL</label>
-                    <input type="text" id="baseUrl" value="http://localhost:5000/api" class="w-full">
-                </div>
-                <div>
-                    <label for="jwtToken" class="block text-sm font-medium mb-1">JWT Token (from Login/Verify)</label>
-                    <input type="text" id="jwtToken" placeholder="Token will appear here after login" class="w-full">
-                </div>
-            </div>
-        </div>
+        <div class="space-y-8">
+            <!-- Auth Token Storage -->
+            <section class="api-section bg-white p-6 rounded-lg shadow-md border-l-4 border-yellow-500">
+                <h2 class="text-2xl font-semibold mb-2 text-gray-700">Authentication Status</h2>
+                <h3 class="font-semibold">Current JWT Token:</h3>
+                <pre id="tokenDisplay" class="bg-yellow-50 text-yellow-800 p-4 rounded mt-2 text-xs">No token yet. Please complete Signup/Login.</pre>
+            </section>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Signup -->
+            <section class="api-section bg-white p-6 rounded-lg shadow-md border-l-4 border-blue-500">
+                <h2 class="text-2xl font-semibold mb-4 text-gray-700">1. User Signup</h2>
+                <form id="signupForm" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <input id="signupName" type="text" placeholder="Name" required class="p-2 border rounded w-full" value="Test User">
+                        <input id="signupEmail" type="email" placeholder="Email" required class="p-2 border rounded w-full" value="testuser@example.com">
+                        <input id="signupPassword" type="password" placeholder="Password" required class="p-2 border rounded w-full" value="password123">
+                    </div>
+                    <button type="submit" class="bg-blue-600 text-white font-bold py-2 px-4 rounded hover:bg-blue-700 transition w-full">Sign Up</button>
+                </form>
+                <div class="mt-4"><h3 class="font-semibold">Response:</h3><pre id="signupResponse" class="bg-gray-50 p-4 rounded mt-2 text-sm">Waiting for request...</pre></div>
+            </section>
+
+            <!-- Verify OTP -->
+            <section class="api-section bg-white p-6 rounded-lg shadow-md border-l-4 border-green-500">
+                <h2 class="text-2xl font-semibold mb-4 text-gray-700">2. Verify OTP</h2>
+                <form id="otpForm" class="space-y-4">
+                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <input id="otpEmail" type="email" placeholder="Email (must match signup)" required class="p-2 border rounded w-full" value="testuser@example.com">
+                        <input id="otpCode" type="text" placeholder="6-Digit OTP" required class="p-2 border rounded w-full">
+                    </div>
+                    <button type="submit" class="bg-green-600 text-white font-bold py-2 px-4 rounded hover:bg-green-700 transition w-full">Verify OTP</button>
+                </form>
+                 <div class="mt-4"><h3 class="font-semibold">Response:</h3><pre id="otpResponse" class="bg-gray-50 p-4 rounded mt-2 text-sm">Waiting for request...</pre></div>
+            </section>
+
+            <!-- Login -->
+            <section class="api-section bg-white p-6 rounded-lg shadow-md border-l-4 border-gray-500">
+                <h2 class="text-2xl font-semibold mb-4 text-gray-700">Login (for existing users)</h2>
+                <form id="loginForm" class="space-y-4">
+                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <input id="loginEmail" type="email" placeholder="Email" required class="p-2 border rounded w-full" value="testuser@example.com">
+                        <input id="loginPassword" type="password" placeholder="Password" required class="p-2 border rounded w-full" value="password123">
+                    </div>
+                    <button type="submit" class="bg-gray-600 text-white font-bold py-2 px-4 rounded hover:bg-gray-700 transition w-full">Login</button>
+                </form>
+                 <div class="mt-4"><h3 class="font-semibold">Response:</h3><pre id="loginResponse" class="bg-gray-50 p-4 rounded mt-2 text-sm">Waiting for request...</pre></div>
+            </section>
             
-            <!-- Left Column: Auth -->
-            <div class="flex flex-col gap-8">
-                <!-- Signup -->
-                <div class="card p-6 rounded-lg">
-                    <h2 class="text-xl font-semibold text-white mb-4">1. User Signup (Step 1)</h2>
-                    <form id="signupForm" class="space-y-4">
-                        <input type="text" id="signupName" placeholder="Name" required class="w-full">
-                        <input type="email" id="signupEmail" placeholder="Email" required class="w-full">
-                        <input type="password" id="signupPassword" placeholder="Password" required class="w-full">
-                        <button type="submit" class="btn w-full">Sign Up</button>
-                    </form>
+            <!-- Protected Routes -->
+            <section class="api-section bg-white p-6 rounded-lg shadow-md border-l-4 border-purple-500">
+                <h2 class="text-2xl font-semibold mb-4 text-gray-700">3. Test Protected Routes</h2>
+                <p class="text-sm text-gray-500 mb-6">These actions will only work after you have a valid token.</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                        <button id="checkUserBtn" class="bg-purple-600 text-white font-bold py-2 px-4 rounded hover:bg-purple-700 transition w-full">Get My Profile (/me)</button>
+                        <div class="mt-4"><h3 class="font-semibold">Response:</h3><pre id="checkUserResponse" class="bg-gray-50 p-4 rounded mt-2 text-sm">Click to test.</pre></div>
+                    </div>
+                    <div>
+                         <button id="fetchReportsBtn" class="bg-purple-600 text-white font-bold py-2 px-4 rounded hover:bg-purple-700 transition w-full">Get My Reports (/my-reports)</button>
+                        <div class="mt-4"><h3 class="font-semibold">Response:</h3><pre id="fetchReportsResponse" class="bg-gray-50 p-4 rounded mt-2 text-sm">Click to test.</pre></div>
+                    </div>
                 </div>
 
-                <!-- Verify OTP -->
-                <div class="card p-6 rounded-lg">
-                    <h2 class="text-xl font-semibold text-white mb-4">2. Verify OTP (Step 2)</h2>
-                    <form id="verifyOtpForm" class="space-y-4">
-                        <input type="email" id="verifyEmail" placeholder="Email (from signup)" required class="w-full">
-                        <input type="text" id="verifyOtp" placeholder="6-Digit OTP from Email" required class="w-full">
-                        <button type="submit" class="btn w-full">Verify OTP & Login</button>
-                    </form>
-                </div>
-
-                <!-- Login -->
-                <div class="card p-6 rounded-lg">
-                    <h2 class="text-xl font-semibold text-white mb-4">3. User Login (Existing User)</h2>
-                    <form id="loginForm" class="space-y-4">
-                        <input type="email" id="loginEmail" placeholder="Email" required class="w-full">
-                        <input type="password" id="loginPassword" placeholder="Password" required class="w-full">
-                        <button type="submit" class="btn w-full">Login</button>
-                    </form>
-                </div>
-            </div>
-
-            <!-- Right Column: Reports -->
-            <div class="flex flex-col gap-8">
-                <!-- Submit Report -->
-                <div class="card p-6 rounded-lg">
-                    <h2 class="text-xl font-semibold text-white mb-4">4. Submit Report (Protected)</h2>
-                    <p class="text-sm text-gray-400 mb-4">You must be logged in (have a JWT Token) to use this.</p>
-                    <form id="submitReportForm" class="space-y-4">
-                        <textarea id="reportDescription" placeholder="Description of the civic issue" required class="w-full h-24 bg-gray-700 border border-gray-600 rounded-md p-2"></textarea>
-                        <input type="text" id="reportLocation" value='{"district": "Ranchi", "block": "Kanke", "locality": "Gandhi Nagar"}' required class="w-full">
+                <div class="border-t pt-6 mb-6">
+                     <h3 class="text-xl font-semibold mb-4 text-gray-700">Submit a New Report</h3>
+                     <form id="reportForm" class="space-y-4">
+                        <input id="reportDescription" type="text" placeholder="Description of the issue" required class="p-2 border rounded w-full" value="Large pothole on main road.">
+                        <textarea id="reportLocation" placeholder="Location JSON" required class="p-2 border rounded w-full h-24">{"district": "Ranchi", "block": "Kanke", "locality": "Gandhi Nagar"}</textarea>
                         <div>
-                            <label for="reportPhoto" class="block text-sm font-medium mb-1">Upload Photo</label>
-                            <input type="file" id="reportPhoto" required class="w-full">
+                            <label for="reportPhoto" class="block text-sm font-medium text-gray-700">Photo of the issue:</label>
+                            <input id="reportPhoto" type="file" required class="p-2 border rounded w-full mt-1">
                         </div>
-                        <button type="submit" class="btn w-full">Submit Report</button>
-                    </form>
+                        <button type="submit" class="bg-purple-600 text-white font-bold py-2 px-4 rounded hover:bg-purple-700 transition w-full">Submit Report</button>
+                     </form>
+                     <div class="mt-4"><h3 class="font-semibold">Response:</h3><pre id="reportResponse" class="bg-gray-50 p-4 rounded mt-2 text-sm">Waiting for request...</pre></div>
                 </div>
 
-                <!-- Get User Reports -->
-                <div class="card p-6 rounded-lg">
-                    <h2 class="text-xl font-semibold text-white mb-4">5. Get My Reports (Protected)</h2>
-                     <p class="text-sm text-gray-400 mb-4">Fetches all reports submitted by the logged-in user.</p>
-                    <button id="getUserReportsBtn" class="btn w-full">Fetch My Reports</button>
+                <!-- NEW: Community Features Section -->
+                <div class="border-t pt-6">
+                    <h2 class="text-2xl font-semibold mb-4 text-gray-700">4. Test Community Features</h2>
+                    
+                    <!-- Get District Feed -->
+                    <div class="mb-6">
+                        <button id="districtFeedBtn" class="bg-teal-600 text-white font-bold py-2 px-4 rounded hover:bg-teal-700 transition w-full">Get District Report Feed</button>
+                        <div class="mt-4"><h3 class="font-semibold">Response:</h3><pre id="districtFeedResponse" class="bg-gray-50 p-4 rounded mt-2 text-sm">Click to test.</pre></div>
+                    </div>
+
+                    <!-- Upvote a Report -->
+                    <div>
+                        <h3 class="text-xl font-semibold mb-4 text-gray-700">Upvote a Report</h3>
+                        <form id="upvoteForm" class="space-y-4">
+                            <input id="upvoteReportId" type="text" placeholder="Enter Report ID to Upvote" required class="p-2 border rounded w-full">
+                            <button type="submit" class="bg-teal-600 text-white font-bold py-2 px-4 rounded hover:bg-teal-700 transition w-full">Upvote Report</button>
+                        </form>
+                        <div class="mt-4"><h3 class="font-semibold">Response:</h3><pre id="upvoteResponse" class="bg-gray-50 p-4 rounded mt-2 text-sm">Waiting for request...</pre></div>
+                    </div>
                 </div>
-            </div>
-
-        </div>
-
-        <!-- Response Area -->
-        <div class="card p-4 rounded-lg mt-8">
-            <h2 class="text-xl font-semibold text-white mb-2">API Response</h2>
-            <pre id="responseArea" class="text-sm text-gray-300">{ "message": "Responses will appear here..." }</pre>
+            </section>
         </div>
     </div>
 
     <script>
-        const baseUrlInput = document.getElementById('baseUrl');
-        const jwtTokenInput = document.getElementById('jwtToken');
-        const responseArea = document.getElementById('responseArea');
+        const API_BASE_URL = 'http://localhost:5000/api';
+        let authToken = null;
 
-        // Helper function to display responses
-        function displayResponse(data) {
-            responseArea.textContent = JSON.stringify(data, null, 2);
-        }
+        const displayResult = (elementId, data) => {
+            document.getElementById(elementId).textContent = JSON.stringify(data, null, 2);
+        };
 
-        // 1. Signup
+        const setToken = (token) => {
+            authToken = token;
+            document.getElementById('tokenDisplay').textContent = authToken || "No token yet.";
+        };
+
+        // Standard Auth Forms
         document.getElementById('signupForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const name = document.getElementById('signupName').value;
-            const email = document.getElementById('signupEmail').value;
-            const password = document.getElementById('signupPassword').value;
-            
+            const body = { name: document.getElementById('signupName').value, email: document.getElementById('signupEmail').value, password: document.getElementById('signupPassword').value };
             try {
-                const res = await fetch(`${baseUrlInput.value}/auth/signup`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name, email, password })
-                });
+                const res = await fetch(`${API_BASE_URL}/auth/signup`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
                 const data = await res.json();
-                displayResponse(data);
-                if(res.ok) {
-                    document.getElementById('verifyEmail').value = email;
-                }
-            } catch (error) {
-                displayResponse({ error: error.message });
-            }
+                displayResult('signupResponse', { status: res.status, body: data });
+            } catch (error) { displayResult('signupResponse', { error: error.message }); }
         });
 
-        // 2. Verify OTP
-        document.getElementById('verifyOtpForm').addEventListener('submit', async (e) => {
+        document.getElementById('otpForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const email = document.getElementById('verifyEmail').value;
-            const otp = document.getElementById('verifyOtp').value;
-
+            const body = { email: document.getElementById('otpEmail').value, otp: document.getElementById('otpCode').value };
             try {
-                const res = await fetch(`${baseUrlInput.value}/auth/verify-otp`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, otp })
-                });
+                const res = await fetch(`${API_BASE_URL}/auth/verify-otp`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
                 const data = await res.json();
-                displayResponse(data);
-                if (data.token) {
-                    jwtTokenInput.value = data.token;
-                    sessionStorage.setItem('authToken', data.token);
-                }
-            } catch (error) {
-                displayResponse({ error: error.message });
-            }
+                displayResult('otpResponse', { status: res.status, body: data });
+                if (data.token) setToken(data.token);
+            } catch (error) { displayResult('otpResponse', { error: error.message }); }
         });
 
-        // 3. Login
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-
+            const body = { email: document.getElementById('loginEmail').value, password: document.getElementById('loginPassword').value };
             try {
-                const res = await fetch(`${baseUrlInput.value}/auth/login`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password })
-                });
+                const res = await fetch(`${API_BASE_URL}/auth/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
                 const data = await res.json();
-                displayResponse(data);
-                if (data.token) {
-                    jwtTokenInput.value = data.token;
-                    sessionStorage.setItem('authToken', data.token);
-                }
-            } catch (error) {
-                displayResponse({ error: error.message });
-            }
+                displayResult('loginResponse', { status: res.status, body: data });
+                if (data.token) setToken(data.token);
+            } catch (error) { displayResult('loginResponse', { error: error.message }); }
+        });
+        
+        // Protected Routes
+        document.getElementById('checkUserBtn').addEventListener('click', async () => {
+            if (!authToken) { displayResult('checkUserResponse', { error: "No auth token." }); return; }
+            try {
+                const res = await fetch(`${API_BASE_URL}/auth/me`, { headers: { 'Authorization': `Bearer ${authToken}` } });
+                const data = await res.json();
+                displayResult('checkUserResponse', { status: res.status, body: data });
+            } catch (error) { displayResult('checkUserResponse', { error: error.message }); }
         });
 
-        // 4. Submit Report
-        document.getElementById('submitReportForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const token = sessionStorage.getItem('authToken');
-            if (!token) {
-                displayResponse({ error: 'Not logged in. Please log in to get a JWT token.' });
-                return;
-            }
+        document.getElementById('fetchReportsBtn').addEventListener('click', async () => {
+            if (!authToken) { displayResult('fetchReportsResponse', { error: "No auth token." }); return; }
+            try {
+                const res = await fetch(`${API_BASE_URL}/reports/my-reports`, { headers: { 'Authorization': `Bearer ${authToken}` } });
+                const data = await res.json();
+                displayResult('fetchReportsResponse', { status: res.status, body: data });
+            } catch (error) { displayResult('fetchReportsResponse', { error: error.message }); }
+        });
 
+        document.getElementById('reportForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!authToken) { displayResult('reportResponse', { error: "No auth token." }); return; }
             const formData = new FormData();
             formData.append('description', document.getElementById('reportDescription').value);
             formData.append('location', document.getElementById('reportLocation').value);
             formData.append('photo', document.getElementById('reportPhoto').files[0]);
-
             try {
-                const res = await fetch(`${baseUrlInput.value}/reports/submit`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: formData
-                });
+                const res = await fetch(`${API_BASE_URL}/reports/submit`, { method: 'POST', headers: { 'Authorization': `Bearer ${authToken}` }, body: formData });
                 const data = await res.json();
-                displayResponse(data);
-            } catch (error) {
-                displayResponse({ error: error.message });
-            }
+                displayResult('reportResponse', { status: res.status, body: data });
+            } catch (error) { displayResult('reportResponse', { error: error.message }); }
         });
 
-        // 5. Get My Reports
-        document.getElementById('getUserReportsBtn').addEventListener('click', async () => {
-            const token = sessionStorage.getItem('authToken');
-            if (!token) {
-                displayResponse({ error: 'Not logged in. Please log in to get a JWT token.' });
-                return;
-            }
-
+        // NEW: Community Features
+        document.getElementById('districtFeedBtn').addEventListener('click', async () => {
+            if (!authToken) { displayResult('districtFeedResponse', { error: "No auth token." }); return; }
             try {
-                const res = await fetch(`${baseUrlInput.value}/reports/my-reports`, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
+                const res = await fetch(`${API_BASE_URL}/reports/district-feed`, { headers: { 'Authorization': `Bearer ${authToken}` } });
+                const data = await res.json();
+                displayResult('districtFeedResponse', { status: res.status, body: data });
+            } catch (error) { displayResult('districtFeedResponse', { error: error.message }); }
+        });
+
+        document.getElementById('upvoteForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const reportId = document.getElementById('upvoteReportId').value;
+            if (!authToken) { displayResult('upvoteResponse', { error: "No auth token." }); return; }
+            if (!reportId) { displayResult('upvoteResponse', { error: "Report ID is required." }); return; }
+            try {
+                const res = await fetch(`${API_BASE_URL}/reports/${reportId}/upvote`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${authToken}` }
                 });
                 const data = await res.json();
-                displayResponse(data);
-            } catch (error) {
-                displayResponse({ error: error.message });
-            }
+                displayResult('upvoteResponse', { status: res.status, body: data });
+            } catch (error) { displayResult('upvoteResponse', { error: error.message }); }
         });
     </script>
 </body>

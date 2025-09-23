@@ -40,7 +40,13 @@ const reportSchema = new mongoose.Schema({
         type: String,
         enum: ['pending', 'approved', 'rejected'],
         default: 'pending',
-    }
+    },
+
+    // Array to store the IDs of users who have upvoted this report.
+    upvotes: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    }]
 }, { timestamps: true });
 
 const Report = mongoose.model('Report', reportSchema);

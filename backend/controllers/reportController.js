@@ -94,3 +94,63 @@ exports.getUserReports = async (req, res) => {
         res.status(500).json({ message: "Server error while fetching reports." });
     }
 };
+
+// --- NEW FEATURE: Get Reports from User's District ---
+exports.getDistrictReports = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id);
+        if (!user || !user.location || !user.location.district) {
+            return res.status(400).json({ message: "User location not found. Cannot fetch district reports." });
+        }
+
+        // Find reports from the same district, excluding the user's own reports.
+        // Populate 'submittedBy' to show the name of the original reporter.
+        const districtReports = await Report.find({
+            'location.district': user.location.district,
+            'submittedBy': { $ne: user._id } // $ne means "not equal"
+        })
+        .sort({ createdAt: -1 })
+        .limit(20) // Limit to the 20 most recent reports
+        .populate('submittedBy', 'name'); // Only fetch the 'name' field of the user
+
+        res.status(200).json({
+            message: "District reports fetched successfully.",
+            reports: districtReports
+        });
+
+    } catch (error) {
+        console.error("Error fetching district reports:", error);
+        res.status(500).json({ message: "Server error while fetching district reports." });
+    }
+};
+
+// --- NEW FEATURE: Upvote a Report ---
+exports.upvoteReport = async (req, res) => {
+    try {
+        const reportId = req.params.reportId;
+        const userId = req.user.id;
+
+        const report = await Report.findById(reportId);
+        if (!report) {
+            return res.status(404).json({ message: "Report not found." });
+        }
+
+        // Check if the user has already upvoted this report
+        if (report.upvotes.includes(userId)) {
+            return res.status(400).json({ message: "You have already upvoted this report." });
+        }
+        
+        // Add the user's ID to the upvotes array
+        report.upvotes.push(userId);
+        await report.save();
+
+        res.status(200).json({
+            message: "Report upvoted successfully.",
+            report: report
+        });
+
+    } catch (error) {
+        console.error("Error upvoting report:", error);
+        res.status(500).json({ message: "Server error while upvoting report." });
+    }
+};

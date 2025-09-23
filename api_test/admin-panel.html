@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CivicDesk Admin API Tester</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .api-section { transition: all 0.3s ease-in-out; }
+        pre { white-space: pre-wrap; word-break: break-all; }
+        h2 { border-bottom: 2px solid; @apply border-gray-200 pb-2 mb-4; }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <div class="container mx-auto p-4 sm:p-6 md:p-8">
+        <header class="text-center mb-10">
+            <h1 class="text-4xl font-bold text-red-600">CivicDesk Admin API Dashboard</h1>
+            <p class="text-gray-600 mt-2">A complete interface to test all backend endpoints for the admin panel.</p>
+        </header>
+
+        <div class="space-y-8">
+            <!-- Auth Token Storage -->
+            <section class="api-section bg-white p-6 rounded-lg shadow-md border-l-4 border-yellow-500">
+                <h2 class="text-2xl font-semibold text-gray-700">Authentication Status</h2>
+                <h3 class="font-semibold">Current Admin JWT Token:</h3>
+                <pre id="tokenDisplay" class="bg-yellow-50 text-yellow-800 p-4 rounded mt-2 text-xs">No token yet. Please log in.</pre>
+            </section>
+
+            <!-- Admin Login -->
+            <section class="api-section bg-white p-6 rounded-lg shadow-md border-l-4 border-blue-500">
+                <h2 class="text-2xl font-semibold text-gray-700">1. Employee Login</h2>
+                <form id="loginForm" class="space-y-4">
+                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <input id="loginEmail" type="email" placeholder="Email" required class="p-2 border rounded w-full" value="admin@civicdesk.com">
+                        <input id="loginPassword" type="password" placeholder="Password" required class="p-2 border rounded w-full" value="Password123!">
+                    </div>
+                    <button type="submit" class="bg-blue-600 text-white font-bold py-2 px-4 rounded hover:bg-blue-700 transition w-full">Login</button>
+                </form>
+                 <div class="mt-4"><h3 class="font-semibold">Response:</h3><pre id="loginResponse" class="bg-gray-50 p-4 rounded mt-2 text-sm">Waiting for request...</pre></div>
+            </section>
+            
+            <!-- General Employee Actions -->
+            <section class="api-section bg-white p-6 rounded-lg shadow-md border-l-4 border-green-500">
+                <h2 class="text-2xl font-semibold text-gray-700">2. General Employee Actions</h2>
+                <p class="text-sm text-gray-500 mb-6">These actions can be performed by any logged-in employee.</p>
+                <!-- Get Reports -->
+                <div class="mb-6">
+                    <button id="getReportsBtn" class="bg-green-600 text-white font-bold py-2 px-4 rounded hover:bg-green-700 transition w-full">Get Reports</button>
+                    <div class="mt-4"><h3 class="font-semibold">Response:</h3><pre id="getReportsResponse" class="bg-gray-50 p-4 rounded mt-2 text-sm">Click to test.</pre></div>
+                </div>
+                <!-- Update Report Status -->
+                <div class="border-t pt-6">
+                     <h3 class="text-xl font-semibold mb-4 text-gray-700">Update a Report's Status</h3>
+                     <form id="updateStatusForm" class="space-y-4">
+                        <input id="updateReportId" type="text" placeholder="Enter Report ID to update" required class="p-2 border rounded w-full">
+                        <select id="newStatus" class="p-2 border rounded w-full">
+                            <option value="Pending">Pending</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Resolved">Resolved</option>
+                        </select>
+                        <button type="submit" class="bg-green-600 text-white font-bold py-2 px-4 rounded hover:bg-green-700 transition w-full">Update Status</button>
+                     </form>
+                     <div class="mt-4"><h3 class="font-semibold">Response:</h3><pre id="updateStatusResponse" class="bg-gray-50 p-4 rounded mt-2 text-sm">Waiting for request...</pre></div>
+                </div>
+            </section>
+
+            <!-- Super Admin Actions -->
+            <section class="api-section bg-white p-6 rounded-lg shadow-md border-l-4 border-red-500">
+                <h2 class="text-2xl font-semibold text-gray-700">3. Super Admin Actions</h2>
+                <p class="text-sm text-gray-500 mb-6">These actions require a Super Admin login.</p>
+                <!-- Register New Employee -->
+                <div class="border-t pt-6 mb-6">
+                    <h3 class="text-xl font-semibold mb-4 text-gray-700">Register New Employee</h3>
+                    <form id="registerForm" class="space-y-4">
+                        <input type="text" id="regName" placeholder="Name" class="p-2 border rounded w-full" value="Test Employee">
+                        <input type="email" id="regEmail" placeholder="Email" class="p-2 border rounded w-full" value="employee@example.com">
+                        <input type="password" id="regPassword" placeholder="Password" class="p-2 border rounded w-full" value="password123">
+                        <select id="regRole" class="p-2 border rounded w-full">
+                            <option value="Employee">Employee</option>
+                            <option value="Super Admin">Super Admin</option>
+                        </select>
+                        <input type="text" id="regDistrict" placeholder="Assigned District (for 'Employee' role)" class="p-2 border rounded w-full" value="Ranchi">
+                        <button type="submit" class="bg-red-600 text-white font-bold py-2 px-4 rounded hover:bg-red-700 transition w-full">Register Employee</button>
+                    </form>
+                    <div class="mt-4"><h3 class="font-semibold">Response:</h3><pre id="registerResponse" class="bg-gray-50 p-4 rounded mt-2 text-sm">Waiting for request...</pre></div>
+                </div>
+                <!-- Get All Employees -->
+                 <div class="border-t pt-6 mb-6">
+                    <button id="getEmployeesBtn" class="bg-red-600 text-white font-bold py-2 px-4 rounded hover:bg-red-700 transition w-full">Get All Employees</button>
+                    <div class="mt-4"><h3 class="font-semibold">Response:</h3><pre id="getEmployeesResponse" class="bg-gray-50 p-4 rounded mt-2 text-sm">Click to test.</pre></div>
+                </div>
+                 <!-- Get Analytics -->
+                <div class="border-t pt-6">
+                    <button id="getAnalyticsBtn" class="bg-red-600 text-white font-bold py-2 px-4 rounded hover:bg-red-700 transition w-full">Get Heatmap Analytics</button>
+                    <div class="mt-4"><h3 class="font-semibold">Response:</h3><pre id="getAnalyticsResponse" class="bg-gray-50 p-4 rounded mt-2 text-sm">Click to test.</pre></div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:5000/api/admin';
+        let adminAuthToken = null;
+
+        const displayResult = (elementId, data) => {
+            document.getElementById(elementId).textContent = JSON.stringify(data, null, 2);
+        };
+
+        const setToken = (token) => {
+            adminAuthToken = token;
+            document.getElementById('tokenDisplay').textContent = adminAuthToken || "No token yet.";
+        };
+
+        // Login
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const body = {
+                email: document.getElementById('loginEmail').value,
+                password: document.getElementById('loginPassword').value,
+            };
+            try {
+                const res = await fetch(`${API_BASE_URL}/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+                const data = await res.json();
+                displayResult('loginResponse', { status: res.status, body: data });
+                if (data.token) setToken(data.token);
+            } catch (error) { displayResult('loginResponse', { error: error.message }); }
+        });
+        
+        // --- Protected Routes ---
+
+        // Get Reports
+        document.getElementById('getReportsBtn').addEventListener('click', async () => {
+            if (!adminAuthToken) { displayResult('getReportsResponse', { error: "No auth token." }); return; }
+            try {
+                const res = await fetch(`${API_BASE_URL}/reports`, { headers: { 'Authorization': `Bearer ${adminAuthToken}` } });
+                const data = await res.json();
+                displayResult('getReportsResponse', { status: res.status, body: data });
+            } catch (error) { displayResult('getReportsResponse', { error: error.message }); }
+        });
+
+        // Update Report Status
+        document.getElementById('updateStatusForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const reportId = document.getElementById('updateReportId').value;
+            const status = document.getElementById('newStatus').value;
+            if (!adminAuthToken) { displayResult('updateStatusResponse', { error: "No auth token." }); return; }
+            if (!reportId) { displayResult('updateStatusResponse', { error: "Report ID is required." }); return; }
+            try {
+                const res = await fetch(`${API_BASE_URL}/reports/${reportId}/status`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminAuthToken}` },
+                    body: JSON.stringify({ status })
+                });
+                const data = await res.json();
+                displayResult('updateStatusResponse', { status: res.status, body: data });
+            } catch (error) { displayResult('updateStatusResponse', { error: error.message }); }
+        });
+
+        // --- Super Admin Routes ---
+
+        // Register Employee
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!adminAuthToken) { displayResult('registerResponse', { error: "No auth token." }); return; }
+            const body = {
+                name: document.getElementById('regName').value,
+                email: document.getElementById('regEmail').value,
+                password: document.getElementById('regPassword').value,
+                role: document.getElementById('regRole').value,
+                location: { district: document.getElementById('regDistrict').value }
+            };
+            try {
+                const res = await fetch(`${API_BASE_URL}/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminAuthToken}` },
+                    body: JSON.stringify(body)
+                });
+                const data = await res.json();
+                displayResult('registerResponse', { status: res.status, body: data });
+            } catch (error) { displayResult('registerResponse', { error: error.message }); }
+        });
+
+        // Get All Employees
+        document.getElementById('getEmployeesBtn').addEventListener('click', async () => {
+            if (!adminAuthToken) { displayResult('getEmployeesResponse', { error: "No auth token." }); return; }
+            try {
+                const res = await fetch(`${API_BASE_URL}/employees`, { headers: { 'Authorization': `Bearer ${adminAuthToken}` } });
+                const data = await res.json();
+                displayResult('getEmployeesResponse', { status: res.status, body: data });
+            } catch (error) { displayResult('getEmployeesResponse', { error: error.message }); }
+        });
+        
+        // Get Analytics
+        document.getElementById('getAnalyticsBtn').addEventListener('click', async () => {
+            if (!adminAuthToken) { displayResult('getAnalyticsResponse', { error: "No auth token." }); return; }
+            try {
+                const res = await fetch(`${API_BASE_URL}/heatmap`, { headers: { 'Authorization': `Bearer ${adminAuthToken}` } });
+                const data = await res.json();
+                displayResult('getAnalyticsResponse', { status: res.status, body: data });
+            } catch (error) { displayResult('getAnalyticsResponse', { error: error.message }); }
+        });
+
+    </script>
+</body>
+</html>
