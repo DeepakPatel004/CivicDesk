@@ -155,4 +155,31 @@ exports.login = async (req, res) => {
     }
 };
 
+// --- 4. GET LOGGED-IN USER DETAILS ---
+// This is the new, protected endpoint for the frontend to check if a user's token is valid.
+exports.getLoggedInUser = async (req, res) => {
+    try {
+        // The authMiddleware has already verified the token and attached the user's ID to req.user
+        const userId = req.user.id;
+
+        // Find the user in the database, but exclude the sensitive password field
+        const user = await User.findById(userId).select('-password');
+
+        if (!user) {
+            // This case is rare, but could happen if the user was deleted after the token was issued
+            return res.status(404).json({ message: "User not found." });
+        }
+
+        // Send back the user's details
+        res.status(200).json({
+            message: "User is authenticated.",
+            user: user
+        });
+
+    } catch (error) {
+        console.error("Error fetching logged-in user:", error);
+        res.status(500).json({ message: "Server error while fetching user profile." });
+    }
+}
+
 

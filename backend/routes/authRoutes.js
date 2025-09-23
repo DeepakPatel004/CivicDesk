@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { signup, verifyOtp, login } = require('../controllers/authController');
+const { signup, verifyOtp, login, getLoggedInUser } = require('../controllers/authController');
 const authMiddleware = require('../middleware/authMiddleware'); // Import the middleware
 const reportController = require('../controllers/reportController');
 
@@ -25,6 +25,11 @@ router.post('/login', login);
 
 // This route is now protected. The authMiddleware will run first.
 router.post('/submit', authMiddleware, reportController.submitReport);
+
+// --- PROTECTED ROUTE ---
+// The frontend will call this route when the app loads to check for a valid session.
+// The final URL will be GET /api/auth/me
+router.get('/me', authMiddleware, getLoggedInUser);
 
 
 module.exports = router;
