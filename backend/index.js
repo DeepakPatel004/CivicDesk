@@ -5,17 +5,19 @@ const cors = require('cors');
 const authRoutes = require('./routes/authRoutes');
 const reportRoutes = require('./routes/reportRoutes');
 const cloudinaryConnect = require('./config/cloudinary');
+const adminRoutes = require('./routes/adminRoutes');
 
 const app = express();
 dotenv.config();
 app.use(express.json()); 
 app.use(cors());
 
-// All routes defined in authRoutes will be prefixed with /api/auth ... For user side frontend
+// For user side frontend
 app.use('/api/auth', authRoutes);
 app.use('/api/reports', reportRoutes);
 
 
+app.use('/api/admin', adminRoutes); // For admin side frontend
 
 //Define a Simple Root Route for Testing ---
 app.get('/', (req, res) => {
