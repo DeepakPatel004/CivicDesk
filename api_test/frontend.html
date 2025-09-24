@@ -103,8 +103,11 @@
                     
                     <!-- Get District Feed -->
                     <div class="mb-6">
-                        <button id="districtFeedBtn" class="bg-teal-600 text-white font-bold py-2 px-4 rounded hover:bg-teal-700 transition w-full">Get District Report Feed</button>
-                        <div class="mt-4"><h3 class="font-semibold">Response:</h3><pre id="districtFeedResponse" class="bg-gray-50 p-4 rounded mt-2 text-sm">Click to test.</pre></div>
+                        <form id="districtFeedForm" class="space-y-4">
+                            <input id="districtName" type="text" placeholder="Enter District Name (e.g., Ranchi)" required class="p-2 border rounded w-full" value="Ranchi">
+                            <button type="submit" class="bg-teal-600 text-white font-bold py-2 px-4 rounded hover:bg-teal-700 transition w-full">Get District Report Feed</button>
+                        </form>
+                        <div class="mt-4"><h3 class="font-semibold">Response:</h3><pre id="districtFeedResponse" class="bg-gray-50 p-4 rounded mt-2 text-sm">Waiting for request...</pre></div>
                     </div>
 
                     <!-- Upvote a Report -->
@@ -201,10 +204,15 @@
         });
 
         // NEW: Community Features
-        document.getElementById('districtFeedBtn').addEventListener('click', async () => {
+        document.getElementById('districtFeedForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const district = document.getElementById('districtName').value;
             if (!authToken) { displayResult('districtFeedResponse', { error: "No auth token." }); return; }
+            if (!district) { displayResult('districtFeedResponse', { error: "District name is required." }); return; }
             try {
-                const res = await fetch(`${API_BASE_URL}/reports/district-feed`, { headers: { 'Authorization': `Bearer ${authToken}` } });
+                const res = await fetch(`${API_BASE_URL}/reports/district-feed?district=${district}`, { 
+                    headers: { 'Authorization': `Bearer ${authToken}` } 
+                });
                 const data = await res.json();
                 displayResult('districtFeedResponse', { status: res.status, body: data });
             } catch (error) { displayResult('districtFeedResponse', { error: error.message }); }

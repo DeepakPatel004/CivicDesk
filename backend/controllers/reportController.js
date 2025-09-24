@@ -95,26 +95,27 @@ exports.getUserReports = async (req, res) => {
     }
 };
 
-// --- NEW FEATURE: Get Reports from User's District ---
+//  Get Reports from User's District ---
 exports.getDistrictReports = async (req, res) => {
     try {
-        const user = await User.findById(req.user.id);
-        if (!user || !user.location || !user.location.district) {
-            return res.status(400).json({ message: "User location not found. Cannot fetch district reports." });
+        // Get the district from the URL's query string (e.g., /district-feed?district=Ranchi)
+        const { district } = req.query;
+
+        if (!district) {
+            return res.status(400).json({ message: "District query parameter is required." });
         }
 
-        // Find reports from the same district, excluding the user's own reports.
-        // Populate 'submittedBy' to show the name of the original reporter.
+        // Find reports from the specified district, excluding the user's own reports.
         const districtReports = await Report.find({
-            'location.district': user.location.district,
-            'submittedBy': { $ne: user._id } // $ne means "not equal"
+            'location.district': district,
+            'submittedBy': { $ne: req.user.id } // $ne means "not equal"
         })
         .sort({ createdAt: -1 })
-        .limit(20) // Limit to the 20 most recent reports
-        .populate('submittedBy', 'name'); // Only fetch the 'name' field of the user
+        .limit(20)
+        .populate('submittedBy', 'name');
 
         res.status(200).json({
-            message: "District reports fetched successfully.",
+            message: `Reports for ${district} fetched successfully.`,
             reports: districtReports
         });
 
@@ -124,7 +125,8 @@ exports.getDistrictReports = async (req, res) => {
     }
 };
 
-// --- NEW FEATURE: Upvote a Report ---
+
+// Toggle Upvote a Report ---
 exports.upvoteReport = async (req, res) => {
     try {
         const reportId = req.params.reportId;
@@ -135,22 +137,30 @@ exports.upvoteReport = async (req, res) => {
             return res.status(404).json({ message: "Report not found." });
         }
 
-        // Check if the user has already upvoted this report
-        if (report.upvotes.includes(userId)) {
-            return res.status(400).json({ message: "You have already upvoted this report." });
+        // Check if the user's ID is already in the upvotes array
+        const hasUpvoted = report.upvotes.includes(userId);
+        let message;
+
+        if (hasUpvoted) {
+            // If the user has already upvoted, remove their ID from the array
+            report.upvotes.pull(userId);
+            message = "Upvote removed successfully.";
+        } else {
+            // If the user has not upvoted, add their ID to the array
+            report.upvotes.push(userId);
+            message = "Report upvoted successfully.";
         }
         
-        // Add the user's ID to the upvotes array
-        report.upvotes.push(userId);
         await report.save();
 
         res.status(200).json({
-            message: "Report upvoted successfully.",
+            message: message,
             report: report
         });
 
     } catch (error) {
-        console.error("Error upvoting report:", error);
-        res.status(500).json({ message: "Server error while upvoting report." });
+        console.error("Error toggling upvote on report:", error);
+        res.status(500).json({ message: "Server error while toggling upvote." });
     }
 };
+
