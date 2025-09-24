@@ -7,6 +7,12 @@ const reportSchema = new mongoose.Schema({
         ref: 'User',
         required: true,
     },
+    title: {
+        type: String,
+        required: [true, "A title is required for the report."],
+        trim: true,
+        maxlength: 100
+    },
     //description of the report.
     content: {
         type: String,
