@@ -1,6 +1,30 @@
 import { Link } from 'react-router-dom';
+import { useState , useEffect} from 'react';
+
 
 const Header = () => {
+
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    // Function to check the auth status and update the state
+    const checkAuthStatus = () => {
+      // We use !! to convert the token value (string or null) to a boolean
+      setIsLoggedIn(!!sessionStorage.getItem('userToken'));
+    };
+
+    // Initial check on component mount
+    checkAuthStatus();
+
+    // Add a global event listener to react to auth changes from any component
+    window.addEventListener('authStateChanged', checkAuthStatus);
+
+    // Cleanup function: remove the event listener when the component unmounts
+    return () => {
+      window.removeEventListener('authStateChanged', checkAuthStatus);
+    };
+  }, []);
+
   return (
     <header className="bg-white shadow-sm border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -14,7 +38,7 @@ const Header = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                 </svg>
               </div>
-              <span className="text-xl font-bold text-gray-900">CivicLens</span>
+              <span className="text-xl font-bold text-gray-900">CivicDesk</span>
             </Link>
           </div>
 
@@ -42,20 +66,26 @@ const Header = () => {
           </nav>
 
           {/* Auth Buttons */}
-          <div className="flex items-center space-x-3">
-            <Link 
-              to="/signin" 
-              className="text-gray-600 hover:text-gray-900 font-medium transition-colors"
-            >
-              Sign In
-            </Link>
-            <Link 
-              to="/signup" 
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors"
-            >
-              Sign Up
-            </Link>
-          </div>
+
+          {
+            !isLoggedIn && (
+              <div className="flex items-center space-x-3">
+                <Link 
+                  to="/signin" 
+                  className="text-gray-600 hover:text-gray-900 font-medium transition-colors"
+                >
+                  Sign In
+                </Link>
+                <Link 
+                  to="/signup" 
+                  className="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                >
+                  Sign Up
+                </Link>
+              </div>
+            )
+          }
+          
 
           {/* Mobile menu button */}
           <div className="md:hidden">
@@ -89,8 +119,9 @@ const Header = () => {
           >
             Report Issue
           </Link>
-          
-          <div className="border-t border-gray-200 pt-3 mt-3">
+
+          {!isLoggedIn && (
+            <div className="border-t border-gray-200 pt-3 mt-3">
             <Link 
               to="/signin" 
               className="block px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md font-medium"
@@ -104,6 +135,9 @@ const Header = () => {
               Sign Up
             </Link>
           </div>
+          )}
+          
+          
         </div>
       </div>
     </header>

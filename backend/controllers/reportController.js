@@ -20,10 +20,12 @@ async function uploadFileToCloudinary(file, folder) {
 // --- SUBMIT A NEW REPORT ---
 exports.submitReport = async (req, res) => {
     try {
+        console.log(12)
         const userId = req.user.id;
         // Destructure title from the request body
         const { title, description, location } = req.body;
         const photo = req.file;
+        console.log(12)
 
         // Add title to the validation check
         if (!photo || !title || !description || !location) {
@@ -37,7 +39,7 @@ exports.submitReport = async (req, res) => {
         
         // 1. Upload image to Cloudinary first
         const cloudinaryResponse = await uploadFileToCloudinary(photo, "CivicDesk/Reports");
-
+        console.log(12)
         // 2. Create the initial report, now with the title
         let newReport = new Report({
             title, // Add the title here
@@ -47,17 +49,22 @@ exports.submitReport = async (req, res) => {
             submittedBy: userId,
         });
         await newReport.save();
+        console.log(12)
         
         // 3. Update user's report history
         const user = await User.findById(userId);
         user.reports.push({ reportId: newReport._id, submittedAt: Date.now() });
         await user.save();
+        console.log(12)
         
         // 4. Respond to the user immediately
         res.status(201).json({
             message: "Report submitted successfully! It is now being analyzed.",
             report: newReport,
         });
+
+        console.log(12)
+
 
         // 5. Asynchronously call the AI Service and update the report later
         (async () => {
@@ -105,11 +112,12 @@ exports.getDistrictReports = async (req, res) => {
         // Find reports from the specified district, excluding the user's own reports.
         const districtReports = await Report.find({
             'location.district': district,
-            'submittedBy': { $ne: req.user.id } // $ne means "not equal"
+            // 'submittedBy': { $ne: req.user.id } // $ne means "not equal"
         })
         .sort({ createdAt: -1 })
         .limit(20)
         .populate('submittedBy', 'name');
+        console.log("district reports: ", districtReports)
 
         res.status(200).json({
             message: `Reports for ${district} fetched successfully.`,
